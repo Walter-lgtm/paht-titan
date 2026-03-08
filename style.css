@@ -1,0 +1,80 @@
+:root {
+    --bg-color: #1a1d23;
+    --panel-color: #242933;
+    --accent-color: #ff9f43; /* Янтарный */
+    --text-color: #d8dee9;
+    --success-color: #43d1af;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    border-bottom: 2px solid var(--accent-color);
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 800px;
+}
+
+h1 { color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; }
+
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+}
+
+section {
+    background: var(--panel-color);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #3b4252;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.input-panel input {
+    background: #2e3440;
+    border: 1px solid var(--accent-color);
+    color: white;
+    padding: 8px;
+    width: 80%;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
+button {
+    background: var(--accent-color);
+    color: #1a1d23;
+    border: none;
+    padding: 15px 30px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    text-transform: uppercase;
+    transition: 0.3s;
+    width: 100%;
+}
+
+button:hover {
+    background: #ffb167;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+.res-card {
+    border-left: 4px solid var(--success-color);
+    padding-left: 15px;
+}
+
+.res-card h3 { color: var(--success-color); }
+hr { border: 0.5px solid #3b4252; margin: 15px 0; }
