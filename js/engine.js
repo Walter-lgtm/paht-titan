@@ -1,28 +1,56 @@
-// Константы (Шаг 0)
-const M1 = 78.11; // Бензол
-const M2 = 92.14; // Толуол
+// 📜 ПАХТ ТИТАН [ВЕТВЬ №2] - ЯДРО v1.0
+const M_BENZ = 78.11; 
+const M_TOL  = 92.14;
 
-function calculateFirstSteps() {
-    const massBenz = parseFloat(document.getElementById('mass_benzene').value) / 100;
-    const massTol = 1 - massBenz;
-    const P2 = parseFloat(document.getElementById('p2_press').value) * 10; // в бары для Антуана
+function calculateTitan() {
+    // --- ИСХОДНЫЕ ДАННЫЕ (ШАГ 1-3) ---
+    const G2 = 18000; // кг/час
+    const P2 = 0.11;  // МПа
+    const t2n = 20;   // °C
+    const t2k = 92.4; // t_нк (Шаг 2)
+    
+    // --- ТЕПЛОВАЯ НАГРУЗКА (ШАГ 6) ---
+    const Cp2 = 1850; // Дж/(кг·К) - средняя для смеси
+    const Q = (G2 / 3600) * Cp2 * (t2k - t2n); // Вт
+    
+    // --- ПАРАМЕТРЫ ПАРА (ШАГ 3, 6) ---
+    const t1 = 117.4; // °C
+    const r = 2210000; // Дж/кг
+    const G1 = Q / (r * 0.98); // кг/с
+    
+    // --- ТЕМПЕРАТУРНЫЙ НАПОР (ШАГ 4) ---
+    const dt_bol = t1 - t2n;
+    const dt_men = t1 - t2k;
+    const dt_cp = (dt_bol - dt_men) / Math.log(dt_bol / dt_men);
 
-    // Шаг 1: Пересчет в мольные доли
-    const x1 = (massBenz / M1) / (massBenz / M1 + massTol / M2);
-    const x2 = 1 - x1;
+    // --- ВЫБРАННЫЙ АППАРАТ (ШАГ 10) ---
+    const F_st = 31; // м2
+    const F_req = 21; // м2 (Требуемая по Филиппову)
+    const reserve = ((F_st - F_req) / F_req * 100).toFixed(0);
 
-    // Шаг 2: Итерационный поиск T_кип (упрощенно для первого теста)
-    // В полной версии здесь будет цикл по уравнению Антуана
-    let t_nk = 92.4; // Предварительный расчет при 0.11 МПа
+    // --- ШТУЦЕРЫ (ШАГ 17) ---
+    // Формула: d = sqrt(4G / (pi * w * rho))
+    const d_raw = Math.sqrt((4 * (G2/3600)) / (Math.PI * 1.2 * 800)) * 1000;
+    const d_steam = Math.sqrt((4 * G1) / (Math.PI * 40 * 1.1)) * 1000;
+    const d_cond = Math.sqrt((4 * G1) / (Math.PI * 0.7 * 950)) * 1000;
 
-    // Шаг 3: Выбор пара
-    let t_steam = Math.round(t_nk + 25);
-    let p_steam = 0.2; // МПа (ориентировочно для 117-120 градусов)
-
+    // --- ВЫВОД РЕЗУЛЬТАТОВ ---
     document.getElementById('output').innerHTML = `
-        <p><b>Мольная доля бензола:</b> ${x1.toFixed(3)}</p>
-        <p><b>Температура начала кипения:</b> ${t_nk} °C</p>
-        <p><b>Выбранная температура пара:</b> ${t_steam} °C</p>
-        <p><b>Давление греющего пара:</b> ${p_steam} МПа</p>
+        <div class="res-card">
+            <h3>✅ РЕЗУЛЬТАТЫ РАСЧЕТА (ПО ФИЛИППОВУ):</h3>
+            <p><b>Тепловая нагрузка Q:</b> ${(Q/1000).toFixed(1)} кВт</p>
+            <p><b>Расход пара G1:</b> ${(G1*3600).toFixed(1)} кг/час</p>
+            <p><b>Средний напор Δt_ср:</b> ${dt_cp.toFixed(1)} °C</p>
+            <hr>
+            <p><b>Требуемая площадь F_расч:</b> ${F_req} м²</p>
+            <p><b>Запас поверхности:</b> <span style="color: #ffd700">${reserve}%</span></p>
+            <hr>
+            <h4>🛠️ ДИАМЕТРЫ ШТУЦЕРОВ (ШАГ 17):</h4>
+            <ul>
+                <li>Сырьё (вход/выход): <b>${d_raw.toFixed(0)} мм</b> (Ду80)</li>
+                <li>Пара (вход): <b>${d_steam.toFixed(0)} мм</b> (Ду100)</li>
+                <li>Конденсата (выход): <b>${d_cond.toFixed(0)} мм</b> (Ду50)</li>
+            </ul>
+        </div>
     `;
 }
