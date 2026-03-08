@@ -3,15 +3,25 @@ const M_BENZ = 78.11;
 const M_TOL  = 92.14;
 
 function calculateTitan() {
-    // --- ИСХОДНЫЕ ДАННЫЕ (ШАГ 1-3) ---
-    const G2 = 18000; // кг/час
-    const P2 = 0.11;  // МПа
-    const t2n = 20;   // °C
-    const t2k = 92.4; // t_нк (Шаг 2)
+    // --- ЖИВЫЕ ДАННЫЕ ИЗ ИНТЕРФЕЙСА ---
+    const massBenz = parseFloat(document.getElementById('mass_benzene').value) / 100;
+    const G2 = parseFloat(document.getElementById('g2_flow').value); // кг/час
+    const P2 = parseFloat(document.getElementById('p2_press').value); // МПа
     
-    // --- ТЕПЛОВАЯ НАГРУЗКА (ШАГ 6) ---
-    const Cp2 = 1850; // Дж/(кг·К) - средняя для смеси
-    const Q = (G2 / 3600) * Cp2 * (t2k - t2n); // Вт
+    const massTol = 1 - massBenz;
+    const t2n = 20; // Начальная температура (можно тоже вынести в инпут)
+
+    // --- ЛОГИКА ПЕРЕСЧЕТА (ШАГ 1-2) ---
+    // Мольные доли для контроля
+    const x1 = (massBenz / M_BENZ) / (massBenz / M_BENZ + massTol / M_TOL);
+    
+    // Температура кипения (упрощенная линейная зависимость для теста, 
+    // пока не внедрили полный цикл Антуана для всех давлений)
+    const t2k = 92.4 + (P2 - 0.11) * 100; // Динамика от давления
+    
+    // --- ТЕПЛОВАЯ НАГРУЗКА (ТЕПЕРЬ ЗАВИСИТ ОТ G2) ---
+    const Cp2 = 1850; 
+    const Q = (G2 / 3600) * Cp2 * (t2k - t2n);
     
     // --- ПАРАМЕТРЫ ПАРА (ШАГ 3, 6) ---
     const t1 = 117.4; // °C
